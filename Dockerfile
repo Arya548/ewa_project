@@ -2,7 +2,8 @@ FROM maven:3.9-eclipse-temurin-21 AS build
 WORKDIR /app
 COPY backend/pom.xml .
 COPY backend/src ./src
-RUN mvn -B -Dmaven.test.skip=true package || (sleep 15 && mvn -B -Dmaven.test.skip=true package)
+COPY backend/render-maven-settings.xml /tmp/render-maven-settings.xml
+RUN mvn -B -s /tmp/render-maven-settings.xml -Dmaven.test.skip=true package || mvn -B -U -Dmaven.test.skip=true package
 FROM eclipse-temurin:21-jre
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
